@@ -1,0 +1,324 @@
+/*
+    Adapted from Explore Web App
+    Master Stylesheet for screen media
+
+*/
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Reset
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+@import "reset.css";
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Global
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+html * {
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent; /* turn off default press states */
+  -webkit-touch-callout: none; /* disable save image on long press */
+  -webkit-user-select: none; /* disable selection copy/paste */
+  -webkit-user-drag: none; /* disable dragging images */
+  background: rgba(0, 0, 0, 0.8);
+  }
+body {
+  font-family: 'proxima-nova', Helvetica, sans-serif;
+  line-height: normal;
+  }
+#container {
+  height: 100%;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  }
+.page {
+  height: 100%;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  -webkit-transform: translateZ(0);
+  }
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Splash
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+#splash {
+  }
+#splash h1 {
+  color: white;
+  font-size: 10em;
+  left: 0;
+  opacity: 0;
+  padding: 5px 10px 10px 80px;
+  position: absolute;
+  text-transform: lowercase;
+  top: 25%;
+  -webkit-transition: opacity 3s ease-in;
+  }
+#splash-image {
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+  -webkit-transform: translateZ(0);
+  }
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Content - contains map and photos
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+#content {
+  background-color: white;
+  /* Map and photos are shifted off screen to the right by default and are animated into
+   * view via JavaScript when the user taps the spash screen. */
+  -webkit-transform: translate3d(100%, 0, 0);
+  }
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Map
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+#map {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  height: 100%;
+  width: 100%;
+  }
+#map .marker {
+  background-image: url(sprite-marker.png);
+  display: block;
+  height: 24px;
+  opacity: 1;
+  position: absolute;
+  width: 24px;
+  -webkit-transition: opacity 200ms ease-in-out;
+  }
+#map .marker.hidden {
+  opacity: 0;
+  }
+#map .marker.selected {
+  background-position: 24px 0;
+  }
+#location {
+  float: right;
+  }
+#location span {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: black;
+  display: block;
+  font-size: 1.4em;
+  line-height: normal;
+  margin: 16px;
+  padding: 4px 8px;
+  }
+#location strong {
+  color: #666;
+  font-weight: normal;
+  }
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Photos
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+#photos {
+  background-color: black;
+  height: 100%;
+  left: 0;
+  border-left: 1px solid white;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: 95%;
+  -webkit-transform: translate3d(117.6470588% /* 100 + 15 / (85/100) */, 0, 0);
+  -webkit-transition: all 600ms ease-in-out;
+  }
+#photos.show {
+  /* Photo gallery only covers 85% of the screen. 15% is left for the map. */
+  -webkit-transform: translate3d(5% /* 15 / (85/100) */, 0, 0);
+  }
+#slides-container {
+  display: table;
+  height: 100%;
+  overflow: hidden;
+  position: absolute;
+  width: 300%;
+  z-index: 10;
+  -webkit-transform: translate3d(-33.333333% /* 100 / (300/100) */, 0, 0);
+  }
+.slide {
+  background-size: cover;
+  background-position: center;
+  display: table-cell;
+  height: 100%;
+  vertical-align: middle;
+  width: 33.333333%;
+  -webkit-transform: translateZ(0);
+  }
+.slide img {
+  max-width: 100%;
+  max-height: 100%;
+  -webkit-transform: translateZ(0);
+  }
+#slide-info {
+  color: white;
+  margin: 16px;
+  overflow: hidden;
+  position: relative;
+  z-index: 100;
+  -webkit-transition: opacity 100ms ease-in;
+  }
+#slide-info.hidden {
+  opacity: 0;
+  }
+#slide-info h1 {
+  background-color: rgba(0, 0, 0, 0.6);
+  float: left;
+  font-size: 3em; /* 30px */
+  line-height: 50px;
+  padding: 0 16px;
+  }
+#slide-details {
+  float: left;
+  font-size: 1.4em; /* 14px */
+  margin: 0 0 0 1px;
+  }
+#slide-details p {
+  background-color: rgba(0, 0, 0, 0.45);
+  clear: both;
+  float: left;
+  line-height: 25px;
+  padding: 0 10px;
+  }
+#slide-details p.location {
+  background-color: rgba(0, 0, 0, 0.35);
+  float: left;
+  line-height: 24px;
+  margin: 1px 0 0 0;
+  }
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Unsupported Browser Message
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+#unsupported-browser {
+  background: black;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  display: none;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  }
+#unsupported-browser div {
+  background: black;
+  border: 1px solid #666;
+  margin: 10% auto 0 auto;
+  padding: 20px;
+  width: 480px;
+  }
+  /* iPhone portrait */
+  @media screen and (max-width: 480px) {
+    #unsupported-browser div {
+      margin: 0 auto;
+      width: 420px;
+      }
+    }
+  /* iPhone landsacape */
+  @media screen and (max-width: 320px) {
+    #unsupported-browser div {
+      margin: 20px auto;
+      width: 250px;
+      }
+    }
+#unsupported-browser h1 {
+  font-size: 3em;
+  }
+#unsupported-browser p {
+  font-size: 1.4em;
+  margin: 20px 0 0 0;
+  }
+#unsupported-browser a {
+  background: white;
+  color: black;
+  display: block;
+  padding: 4px 10px;
+  text-align: center;
+  text-decoration: none;
+  width: 100px;
+  }
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Loading Spinner
+    Thanks to Jason Z: http://37signals.com/svn/posts/2577-loading-spinner-animation-using-css-and-webkit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+#spinner {
+  display: inline-block;
+  height: 128px;
+  left: 50%;
+  margin: -64px 0 0 -64px;
+  position: absolute;
+  top: 50%;
+  width: 128px;
+  -webkit-transition: opacity 200ms ease-in;
+  }
+#spinner div {
+  background: white;
+  height: 26%;
+  left: 45%;
+  opacity: 0;
+  position: absolute;
+  top: 37%;
+  width: 10%;
+  -webkit-border-radius: 50px;
+  -webkit-animation: fade 1s linear infinite;
+  }
+  #spinner div.bar1 { -webkit-transform: rotate(0deg) translate(0, -142%); -webkit-animation-delay: 0s; }
+  #spinner div.bar2 { -webkit-transform: rotate(30deg) translate(0, -142%); -webkit-animation-delay: -0.9167s; }
+  #spinner div.bar3 { -webkit-transform: rotate(60deg) translate(0, -142%); -webkit-animation-delay: -0.833s; }
+  #spinner div.bar4 { -webkit-transform: rotate(90deg) translate(0, -142%); -webkit-animation-delay: -0.75s; }
+  #spinner div.bar5 { -webkit-transform: rotate(120deg) translate(0, -142%); -webkit-animation-delay: -0.667s; }
+  #spinner div.bar6 { -webkit-transform: rotate(150deg) translate(0, -142%); -webkit-animation-delay: -0.5833s; }
+  #spinner div.bar7 { -webkit-transform: rotate(180deg) translate(0, -142%); -webkit-animation-delay: -0.5s; }
+  #spinner div.bar8 { -webkit-transform: rotate(210deg) translate(0, -142%); -webkit-animation-delay: -0.41667s; }
+  #spinner div.bar9 { -webkit-transform: rotate(240deg) translate(0, -142%); -webkit-animation-delay: -0.333s; }
+  #spinner div.bar10 { -webkit-transform: rotate(270deg) translate(0, -142%); -webkit-animation-delay: -0.25s; }
+  #spinner div.bar11 { -webkit-transform: rotate(300deg) translate(0, -142%); -webkit-animation-delay: -0.1667s; }
+  #spinner div.bar12 { -webkit-transform: rotate(330deg) translate(0, -142%); -webkit-animation-delay: -0.0833s; }
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Animations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+/* Slow pan left/right animation used for the splash screen. */
+.pan {
+  -webkit-animation-name: pan;
+  -webkit-animation-direction: alternate;
+  -webkit-animation-duration: 15s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: ease-in-out;
+  }
+@-webkit-keyframes pan {
+  from {
+    -webkit-transform: translate3d(10%, 0, 0) scale3d(1.2, 1.2, 1.0);
+    }
+  to {
+    -webkit-transform: translate3d(-10%, 0, 0) scale3d(1.2, 1.2, 1.0);
+    }
+  }
+@-webkit-keyframes fade {
+  from {
+    opacity: 1;
+    }
+  to {
+    opacity: 0.25;
+    }
+  }
