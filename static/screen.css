@@ -16,8 +16,8 @@ body {
 /* slider container */
 .iosSlider {
   height: 100%;
-  width: 100;
-  padding: 1%;
+  width: 100%;
+  padding: 0;
   top: 0;
   left: 0;
   overflow: hidden;
@@ -42,4 +42,26 @@ body {
     vertical-align: middle;
     overflow: hidden;
     text-align: center;
+}
+
+.slideinfo {
+    box-shadow: 0 0 10px -5px black;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    z-index: 10;
+}
+h1, h2 {
+    color: white
+}
+h2 {
+    font-size: 100%
+}
+h1 {
+    font-size: 200%;
+}
+img {
+    max-width: 100% !important;
+    max-height: 100% !important;
 }

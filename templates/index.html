@@ -16,29 +16,68 @@
   <body>
       <!-- slider container -->
       <div class = 'iosSlider'>
-
           <!-- slider -->
           <div class = 'slider'>
-
-              <!-- slides -->
-               {% for obj in objects %}
-                  <div class = 'slide'><img src="{{obj.url}}"></div>
-               {% endfor %}
-
+              <div class="slide"><h1>Welcome to Weechat URL slider</h1><h2>Slide to win</div>
+              <div class="slide"><h1>You have reached the end</h1><h2>Of the internets</h2></div>
           </div>
-<script>
+      </div>
+      <div class="slideinfo">
+          <h1>
+          </h1>
+          <h2>
+          </h2>
+      </div>
 
+      <div id="next"></div>
+
+<script>
+    var slides = [];
+    var currentSlide = 0;
+    var slideComplete = function(args) {
+        currentSlide = args.currentSlideNumber;
+        nr = args.numberOfSlides;
+        console.log('Nrofslides ', nr);
+        addSlide(slides[nr-2], nr);
+    }
+    var slideUpdater = function(args) {
+        currentSlide = args.currentSlideNumber;
+        urlobj = slides[currentSlide-1]
+        $('.slideinfo h1').html(urlobj.buffer_name + ' ' + urlobj.nick);
+        $('.slideinfo h2').html(urlobj.message.replace(urlobj.url, ''));
+        console.log('Currentslide ', currentSlide);
+    }
+    var slideHTML = function(url) {
+        return "<div class='slide'><img src="+url+"></div>";
+    }
+    var addSlide = function(slideobj, slidepos) {
+        $('.iosSlider').iosSlider('addSlide', slideHTML(slideobj.url), slidepos);
+    }
+
+    // Init the slider
     $('.iosSlider').iosSlider({
         desktopClickDrag: true,
         snapToChildren: true,
         autoSlideTransTimer: 500,
+        onSlideChange: slideUpdater,
+        onSlideComplete: slideComplete,
+        navNextSelector: $('#next'),
     });
 
-$(document).ready(function() {
-    // Trigger responsive
-     $('.iosSlider').iosSlider('update');
-     $('.iosSlider').css('height: 100%');
+    // Fetch the urls
+    $.getJSON('/api/img', function(data) { 
+        slides = data.urls;
+        for(i=2;i<92;i++) {
+            addSlide(slides[i], i);
+        }
+        // Trigger responsive
+        $('.iosSlider').iosSlider('update');
+        $('.iosSlider').css('height: 100%');
+    })
 
+
+$(document).ready(function() {
+    //$('body').bind('click', function() { $('#next').click(); } );
 });
 </script>
   </body>
