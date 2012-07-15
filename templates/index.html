@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <title>Weechat URLs</title>
     <link rel="stylesheet" href="static/screen.css" type="text/css" />
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script type="text/javascript" src="static/app.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript" src="static/jquery.iosslider.js"></script>
     <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="apple-touch-icon" href="images/icons/icon-homescreen.png" />
@@ -14,66 +14,33 @@
     <script type="application/javascript" src="static/add2home.js"></script>
   </head>
   <body>
-      <script>
-          var PhotoData = {{ objects|safe }};
-      </script>
-      <!--
-      <ul class="urls">
-          <li class="bar">
-              <h1><a href="/urlserver/">WeeChat URLs</a>
-                  <span class="small">Showing URLs</span>
-                  <span><div class="sortable"><form method="get"><input type="text" name="search" value="" placeholder="Search"></input></form></div></span>
-            </h1>
-          </li>
-      </ul>
-      -->
+      <!-- slider container -->
+      <div class = 'iosSlider'>
 
-    <div id="container">
-      <div id="splash" class="page">
-        <div id="splash-image" class="pan"></div>
-        <h1>Consume.</h1>
-        <div id="spinner">
-          <div class="bar1"></div>
-          <div class="bar2"></div>
-          <div class="bar3"></div>
-          <div class="bar4"></div>
-          <div class="bar5"></div>
-          <div class="bar6"></div>
-          <div class="bar7"></div>
-          <div class="bar8"></div>
-          <div class="bar9"></div>
-          <div class="bar10"></div>
-          <div class="bar11"></div>
-          <div class="bar12"></div>
-        </div>
-      </div>
-      <div id="content" class="page">
-        <div id="map">
-          <div id="location"></div>
-        </div>
-        <div id="photos">
-          <div id="slides-container">
-            <div class="slide"></div>
-            <div class="slide"></div>
-            <div class="slide"></div>
+          <!-- slider -->
+          <div class = 'slider'>
+
+              <!-- slides -->
+               {% for obj in objects %}
+                  <div class = 'slide'><img src="{{obj.url}}"></div>
+               {% endfor %}
+
           </div>
-          <section id="slide-info">
-            <h1></h1>
-            <div id="slide-details">
-                <p></p>
-              <p class="location"></p>
-            </div>
-          </section>
-        </div>
-      </div>
-    </div>
-    <div id="unsupported-browser">
-      <div>
-        <h1>Explore App is optimized for WebKit.</h1>
-        <p class="message">This app is only compatible with WebKit browsers.</p>
-        <p><a href="#">OK</a></p>
-      </div>
-    </div>
+<script>
+
+    $('.iosSlider').iosSlider({
+        desktopClickDrag: true,
+        snapToChildren: true,
+        autoSlideTransTimer: 500,
+    });
+
+$(document).ready(function() {
+    // Trigger responsive
+     $('.iosSlider').iosSlider('update');
+     $('.iosSlider').css('height: 100%');
+
+});
+</script>
   </body>
 </html>
 

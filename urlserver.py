@@ -23,7 +23,7 @@ def query_db(query, args=(), one=False):
                for idx, value in enumerate(row)) for row in cur.fetchall()]
     return (rv[0] if rv else None) if one else rv
 
-def get_urls(order_by='time', search='', page=1, amount=100):
+def get_urls(order_by='time', search='', page=1, amount=1000):
     offset = page * amount - amount
     if search:
         search ='''
@@ -53,7 +53,7 @@ def index():
         if url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg')):
             #obj = '<div class="obj"><img src="%s" title="%s" alt="%s"></div>' % (url, url, url)
             objects.append(obj)
-    objects = json.dumps(objects)
+    #objects = json.dumps(objects)
     return render_template('index.html', objects=objects)
 
 
