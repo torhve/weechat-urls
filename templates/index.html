@@ -43,15 +43,19 @@
     var slideUpdater = function(args) {
         currentSlide = args.currentSlideNumber;
         urlobj = slides[currentSlide-1]
-        $('.slideinfo h1').html(urlobj.buffer_name + ' ' + urlobj.nick);
-        $('.slideinfo h2').html(urlobj.message.replace(urlobj.url, ''));
+        slide = $(args.currentSlideObject);
+        title = slide.find('title').html();
+        $('.slideinfo h1').html(title);
+        $('.slideinfo h2').html(slide.find('msg').html());
         console.log('Currentslide ', currentSlide);
     }
-    var slideHTML = function(url) {
-        return "<div class='slide'><img src="+url+"></div>";
+    var slideHTML = function(urlobj) {
+        title = urlobj.buffer_name + ' ' + urlobj.nick;
+        caption = urlobj.message.replace(urlobj.url, '');
+        return "<div class='slide'><img src="+urlobj.url+"><title>"+title+"</title><msg>"+caption+"</msg></div>";
     }
     var addSlide = function(slideobj, slidepos) {
-        $('.iosSlider').iosSlider('addSlide', slideHTML(slideobj.url), slidepos);
+        $('.iosSlider').iosSlider('addSlide', slideHTML(slideobj), slidepos);
     }
 
     // Init the slider
@@ -67,7 +71,7 @@
     // Fetch the urls
     $.getJSON('/api/img', function(data) { 
         slides = data.urls;
-        for(i=2;i<92;i++) {
+        for(i=2;i<22;i++) {
             addSlide(slides[i], i);
         }
         // Trigger responsive
