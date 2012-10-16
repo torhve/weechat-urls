@@ -5,83 +5,47 @@
     <title>Weechat URLs</title>
     <link rel="stylesheet" href="static/screen.css" type="text/css" />
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script type="text/javascript" src="static/jquery.iosslider.js"></script>
     <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="apple-touch-icon" href="images/icons/icon-homescreen.png" />
     <meta name="format-detection" content="telephone=no" />
     <link rel="stylesheet" href="static/add2home.css">
     <script type="application/javascript" src="static/add2home.js"></script>
+    <script type="application/javascript" src="static/masonry/jquery.masonry.min.js"></script>
   </head>
   <body>
-      <!-- slider container -->
-      <div class = 'iosSlider'>
-          <!-- slider -->
-          <div class = 'slider'>
-              <div class="slide"><h1>Welcome to Weechat URL slider</h1><h2>Slide to win</div>
-              <div class="slide"><h1>You have reached the end</h1><h2>Of the internets</h2></div>
-          </div>
+      <div id="container" class='container'>
       </div>
-      <div class="slideinfo">
-          <h1>
-          </h1>
-          <h2>
-          </h2>
-      </div>
-
       <div id="next"></div>
-
 <script>
     var slides = [];
     var currentSlide = 0;
-    var slideComplete = function(args) {
-        currentSlide = args.currentSlideNumber;
-        nr = args.numberOfSlides;
-        console.log('Nrofslides ', nr);
-        addSlide(slides[nr-2], nr);
-    }
-    var slideUpdater = function(args) {
-        currentSlide = args.currentSlideNumber;
-        urlobj = slides[currentSlide-1]
-        slide = $(args.currentSlideObject);
-        title = slide.find('title').html();
-        $('.slideinfo h1').html(title);
-        $('.slideinfo h2').html(slide.find('msg').html());
-        console.log('Currentslide ', currentSlide);
-    }
-    var slideHTML = function(urlobj) {
-        title = urlobj.buffer_name + ' ' + urlobj.nick;
+    var itemHTML = function(urlobj) {
+        title = urlobj.nick + '@' + urlobj.buffer_name;
         caption = urlobj.message.replace(urlobj.url, '');
-        return "<div class='slide'><img src="+urlobj.url+"><title>"+title+"</title><msg>"+caption+"</msg></div>";
+        return "<div class='item'><img src="+urlobj.url+"><div class=meta><div class=title>"+title+"</div><div class=msg>"+caption+"</div></div></div>";
     }
-    var addSlide = function(slideobj, slidepos) {
-        $('.iosSlider').iosSlider('addSlide', slideHTML(slideobj), slidepos);
+    var addItem = function(slideobj, slidepos) {
+        $('.container').append(itemHTML(slideobj));
     }
-
-    // Init the slider
-    $('.iosSlider').iosSlider({
-        desktopClickDrag: true,
-        snapToChildren: true,
-        autoSlideTransTimer: 500,
-        onSlideChange: slideUpdater,
-        onSlideComplete: slideComplete,
-        navNextSelector: $('#next'),
-    });
 
     // Fetch the urls
     $.getJSON('/api/img', function(data) { 
-        slides = data.urls;
-        for(i=2;i<22;i++) {
-            addSlide(slides[i], i);
-        }
-        // Trigger responsive
-        $('.iosSlider').iosSlider('update');
-        $('.iosSlider').css('height: 100%');
+        images = data.urls;
+        $.each(images, function(i, obj) {
+            addItem(obj, i);
+        });
     })
-
+    var doMasonry = function() {
+        $('#container').masonry({
+            itemSelector : '.item',
+            columnWidth : 480
+        });
+    };
 
 $(document).ready(function() {
     //$('body').bind('click', function() { $('#next').click(); } );
+        doMasonry();
 });
 </script>
   </body>

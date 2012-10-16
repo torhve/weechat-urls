@@ -36,13 +36,9 @@ def get_urls(order_by='time', search='', page=1, amount=100):
         search ='''
         WHERE
             buffer_name REGEXP '%s'
-        OR
+        AND
             url REGEXP '%s'
-        OR
-            message REGEXP '%s'
-        OR
-            nick REGEXP '%s'
-                ''' %(search, search, search, search)
+                ''' %('lart', search)
     sql ='''
         SELECT
         url, number, time, nick, buffer_name, message, prefix

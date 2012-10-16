@@ -1,0 +1,3 @@
+[submodule "static/masonry"]
+	path = static/masonry
+	url = https://github.com/desandro/masonry.git

@@ -9,63 +9,23 @@ html * {
 body {
   font-family: 'proxima-nova', Helvetica, sans-serif;
   line-height: normal;
-  background: #363739 url(container-bg.jpg) repeat 50% 0;
-  overflow: hidden;
+  background: #363739;
   }
 
-/* slider container */
-.iosSlider {
-  height: 100%;
-  width: 100%;
-  padding: 0;
-  top: 0;
-  left: 0;
-  overflow: hidden;
-  position: absolute;
-}
-
-/* slider */
-.iosSlider .slider {
-    /* required */
-    width: 100%;
-    height: 100%;
-  overflow: hidden;
-}
-
-/* slide */
-.iosSlider .slider .slide {
-    /* required */
+.item {
     float: left;
-    width: 100%;
-    height: 100%;
-    display: table-cell;
-    vertical-align: middle;
-    overflow: hidden;
-    text-align: center;
+    margin: 5px;
+    padding: 5px;
+    background: white;
+    border: 1px solid #dedede;
 }
-
-.slideinfo {
-    box-shadow: 0 0 10px -5px black;
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 10px;
-    z-index: 10;
-    opacity: 0.8;
+.item img {
+    max-width: 480px;
 }
-h1, h2 {
-    color: white
-}
-h2 {
-    font-size: 100%
-}
-h1 {
-    font-size: 200%;
-}
-img {
-    max-width: 100% !important;
-    max-height: 100% !important;
+.meta {
+    border-top: 1px solid #dedede;
+    margin-bottom: 5px;
 }
 msg, title {
-    visibility: none;
+    color: white;
 }
