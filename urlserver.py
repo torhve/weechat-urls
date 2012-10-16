@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import url_for, render_template, Markup, g, jsonify
+from flask import url_for, render_template, Markup, g, jsonify, request
 import sqlite3
 import json
 import re
@@ -7,7 +7,7 @@ app = Flask(__name__)
 DATABASE  = '/home/xt/.weechat/urlserver.sqlite3'
 
 def regexp(expr, item):
-    reg = re.compile(expr)
+    reg = re.compile(expr, re.IGNORECASE)
     return reg.search(item) is not None
 
 def connect_db():
@@ -30,7 +30,7 @@ def query_db(query, args=(), one=False):
                for idx, value in enumerate(row)) for row in cur.fetchall()]
     return (rv[0] if rv else None) if one else rv
 
-def get_urls(order_by='time', search='', page=1, amount=100):
+def get_urls(order_by='time', search='', page=1, amount=15):
     offset = page * amount - amount
     if search:
         search ='''
@@ -38,7 +38,7 @@ def get_urls(order_by='time', search='', page=1, amount=100):
             buffer_name REGEXP '%s'
         AND
             url REGEXP '%s'
-                ''' %('lart', search)
+                ''' %('#lart', search)
     sql ='''
         SELECT
         url, number, time, nick, buffer_name, message, prefix
@@ -55,8 +55,16 @@ def index():
 
 @app.route('/api/img')
 def img():
-    search= '(.jpg|.jpeg|.png|.gif|.bmp|.svg)'
-    objects = get_urls(search=search)
+    search= '(\.jpg|\.jpeg|\.png|\.gif|\.bmp|\.svg)'
+    page = request.args.get('page')
+    if page:
+        try:
+            page = int(page)
+        except:
+            page = 1
+    else:
+        page = 1
+    objects = get_urls(search=search,page=page)
     return jsonify(urls=objects)
 
 #url_for('static', filename='style.css')

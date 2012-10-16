@@ -1,3 +1,6 @@
 [submodule "static/masonry"]
 	path = static/masonry
 	url = https://github.com/desandro/masonry.git
+[submodule "static/infinite-scroll"]
+	path = static/infinite-scroll
+	url = https://github.com/paulirish/infinite-scroll

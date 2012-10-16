@@ -12,22 +12,33 @@
     <link rel="stylesheet" href="static/add2home.css">
     <script type="application/javascript" src="static/add2home.js"></script>
     <script type="application/javascript" src="static/masonry/jquery.masonry.min.js"></script>
+    <script type="application/javascript" src="static/lightview-3.2.5/js/spinners/spinners.min.js"></script>
+    <script type="application/javascript" src="static/lightview-3.2.5/js/lightview/lightview.js"></script>
+    <script type="application/javascript" src="static/infinite-scroll/jquery.infinitescroll.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/lightview-3.2.5/css/lightview/lightview.css"/>
+
   </head>
   <body>
       <div id="container" class='container'>
       </div>
-      <div id="next"></div>
+      <nav id="next"><a href="/api/img?page=2">Moar</a></nav>
 <script>
     var slides = [];
     var currentSlide = 0;
+    var $container = $('#container');
+
+
     var itemHTML = function(urlobj) {
         title = urlobj.nick + '@' + urlobj.buffer_name;
         caption = urlobj.message.replace(urlobj.url, '');
-        return "<div class='item'><img src="+urlobj.url+"><div class=meta><div class=title>"+title+"</div><div class=msg>"+caption+"</div></div></div>";
+        return "<div class='item'><a class=lightview data-lightview-group=imgs data-lightview-title='"+title+"' data-lightview-caption='"+caption+"' href='"+urlobj.url+"'><img src="+urlobj.url+"></a><div class=meta><div class=title>"+title+"</div><div class=msg>"+caption+"</div></div></div>";
     }
     var addItem = function(slideobj, slidepos) {
-        $('.container').append(itemHTML(slideobj));
+        console.log('adding item');
+        $container.append(itemHTML(slideobj));
     }
+
+
 
     // Fetch the urls
     $.getJSON('/api/img', function(data) { 
@@ -35,17 +46,50 @@
         $.each(images, function(i, obj) {
             addItem(obj, i);
         });
+        doMasonry();
     })
     var doMasonry = function() {
-        $('#container').masonry({
-            itemSelector : '.item',
-            columnWidth : 480
+        console.log('Doing initial masonry');
+        $container.imagesLoaded( function(){
+            $container.masonry({
+                itemSelector : '.item',
+            });
         });
+
     };
+
+
+    // Add infinite scrolling
+    $container.infinitescroll({
+      dataType: 'json', // we expect JSON
+      navSelector  : '#next',    // selector for the paged navigation 
+      nextSelector : '#next a:first',  // selector for the NEXT link (to page 2)
+      loading: {
+          finishedMsg: 'You have reached the end of the internets.',
+          img: 'http://i.imgur.com/6RMhx.gif'
+      },
+      template: function(data) {
+        var msg = "";
+        data = data.urls;
+        for(var i=0;i<data.length;i++) {
+            msg += itemHTML(data[i]); // convert data[i] (JSON data) to HTML.
+        }
+        return msg;
+      }},
+      function( newElements ) {
+        // hide new items while they are loading
+        var $newElems = $( newElements ).css({ opacity: 0 });
+        // ensure that images load before adding to masonry layout
+        $newElems.imagesLoaded(function(){
+          // show elems now they're ready
+          $newElems.animate({ opacity: 1 });
+          $container.masonry( 'appended', $newElems, true ); 
+        });
+      }
+    );
 
 $(document).ready(function() {
     //$('body').bind('click', function() { $('#next').click(); } );
-        doMasonry();
 });
 </script>
   </body>
