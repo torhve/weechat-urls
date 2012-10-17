@@ -4,3 +4,6 @@
 [submodule "static/infinite-scroll"]
 	path = static/infinite-scroll
 	url = https://github.com/paulirish/infinite-scroll
+[submodule "static/imagesloaded"]
+	path = static/imagesloaded
+	url = https://github.com/desandro/imagesloaded

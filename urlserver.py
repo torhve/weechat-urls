@@ -30,32 +30,34 @@ def query_db(query, args=(), one=False):
                for idx, value in enumerate(row)) for row in cur.fetchall()]
     return (rv[0] if rv else None) if one else rv
 
-def get_urls(order_by='time', search='', page=1, amount=15):
+def get_urls(buf=None,order_by='time', search='', page=1, amount=15):
     offset = page * amount - amount
+    where = 'WHERE '
+    if buf:
+        where += "buffer_name REGEXP '%s' or message REGEXP '%s' " %(buf, buf)
     if search:
-        search ='''
-        WHERE
-            buffer_name REGEXP '%s'
-        AND
-            url REGEXP '%s'
-                ''' %('#lart', search)
+        if buf:
+            where += 'AND '
+        where  +="url REGEXP '%s'" %search
     sql ='''
         SELECT
         url, number, time, nick, buffer_name, message, prefix
         FROM urls
         %s
         ORDER BY %s desc
-        LIMIT %s OFFSET %s''' %(search, order_by, amount, offset)
+        LIMIT %s OFFSET %s''' %(where, order_by, amount, offset)
     print "Running SQL: %s" %sql
     return query_db(sql)
 
 @app.route('/')
-def index():
-    return render_template('index.html')
+@app.route('/<buf>')
+def index(buf=None):
+    return render_template('index.html', buffer=buf)
 
 @app.route('/api/img')
-def img():
-    search= '(\.jpg|\.jpeg|\.png|\.gif|\.bmp|\.svg)'
+@app.route('/api/<buf>/img')
+def img(buf=None):
+    search = '(\.jpg|\.jpeg|\.png|\.gif|\.bmp|\.svg)'
     page = request.args.get('page')
     if page:
         try:
@@ -64,8 +66,21 @@ def img():
             page = 1
     else:
         page = 1
-    objects = get_urls(search=search,page=page)
+    objects = get_urls(buf,search=search,page=page)
     return jsonify(urls=objects)
+
+@app.route('/api/stats')
+@app.route('/api/<buf>/stats')
+def stats(buf=None):
+    where = ''
+    objects =[]
+    if buf:
+        where = "where buffer_name REGEXP '%s'" %buf
+    sql = 'select nick, count(*) as urls from urls %s group by nick order by urls desc limit 15' %where
+    objects = query_db(sql)
+    sql = 'select url, count(*) as count from urls %s group by url order by count desc limit 15' %where
+    urlstats = query_db(sql)
+    return jsonify(urlstats=urlstats,posters=objects)
 
 #url_for('static', filename='style.css')
 

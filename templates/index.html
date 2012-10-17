@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="static/add2home.css">
     <script type="application/javascript" src="static/add2home.js"></script>
     <script type="application/javascript" src="static/masonry/jquery.masonry.min.js"></script>
+    <script type="application/javascript" src="static/imagesloaded/jquery.imagesloaded.min.js"></script>
     <script type="application/javascript" src="static/lightview-3.2.5/js/spinners/spinners.min.js"></script>
     <script type="application/javascript" src="static/lightview-3.2.5/js/lightview/lightview.js"></script>
     <script type="application/javascript" src="static/infinite-scroll/jquery.infinitescroll.min.js"></script>
@@ -21,27 +22,24 @@
   <body>
       <div id="container" class='container'>
       </div>
-      <nav id="next"><a href="/api/img?page=2">Moar</a></nav>
+      <nav id="next"><a href="api/{% if buffer %}{{buffer}}/{% endif %}img?page=2">Moar</a></nav>
 <script>
     var slides = [];
     var currentSlide = 0;
     var $container = $('#container');
-
-
+    
     var itemHTML = function(urlobj) {
         title = urlobj.nick + '@' + urlobj.buffer_name;
         caption = urlobj.message.replace(urlobj.url, '');
         return "<div class='item'><a class=lightview data-lightview-group=imgs data-lightview-title='"+title+"' data-lightview-caption='"+caption+"' href='"+urlobj.url+"'><img src="+urlobj.url+"></a><div class=meta><div class=title>"+title+"</div><div class=msg>"+caption+"</div></div></div>";
     }
     var addItem = function(slideobj, slidepos) {
-        console.log('adding item');
         $container.append(itemHTML(slideobj));
     }
 
 
-
     // Fetch the urls
-    $.getJSON('/api/img', function(data) { 
+    $.getJSON('api/{% if buffer %}{{buffer}}/{% endif %}img', function(data) { 
         images = data.urls;
         $.each(images, function(i, obj) {
             addItem(obj, i);
@@ -49,15 +47,15 @@
         doMasonry();
     })
     var doMasonry = function() {
-        console.log('Doing initial masonry');
-        $container.imagesLoaded( function(){
+        $container.imagesLoaded(function( $images, $proper, $broken ) {
+            console.log( $broken.length + ' broken images' );
+
             $container.masonry({
                 itemSelector : '.item',
             });
         });
 
     };
-
 
     // Add infinite scrolling
     $container.infinitescroll({
@@ -80,10 +78,12 @@
         // hide new items while they are loading
         var $newElems = $( newElements ).css({ opacity: 0 });
         // ensure that images load before adding to masonry layout
-        $newElems.imagesLoaded(function(){
-          // show elems now they're ready
-          $newElems.animate({ opacity: 1 });
-          $container.masonry( 'appended', $newElems, true ); 
+        $newElems.imagesLoaded(function( $images, $proper, $broken ) {
+            console.log( $broken.length + ' broken images' );
+
+            // show elems now they're ready
+            $newElems.animate({ opacity: 1 });
+            $container.masonry( 'appended', $newElems, true ); 
         });
       }
     );
