@@ -8,8 +8,10 @@ from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.schema import (Table, Column, PrimaryKeyConstraint, UniqueConstraint, ForeignKey, ForeignKeyConstraint, Index, MetaData)
 
+from local_config import DBSTRING
+
 Base = declarative_base()
-engine = create_engine('postgresql://weeurls:P!"#uppen@localhost/weechat', echo=False)
+engine = create_engine(DBSTRING, echo=False)
 
 from sqlalchemy.orm import sessionmaker
 Session = sessionmaker(bind=engine)
@@ -17,7 +19,7 @@ session = Session()
 
 class Message(Base):
     __tablename__ = 'lines'
-    __table_args__ = (UniqueConstraint('nick', 'message', name='_nick_message_uc'),)
+    __table_args__ = (UniqueConstraint('time', 'nick', 'message', name='_nick_message_uc'),)
 
     id = Column(Integer, primary_key=True)
     network = Column(String(20))
