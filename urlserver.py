@@ -1,10 +1,55 @@
 from flask import Flask
-from flask import url_for, render_template, Markup, g, jsonify, request
+from flask import url_for, render_template, Markup, g, jsonify, request, Response
+from functools import wraps
+
 import sqlite3
 import json
 import re
 app = Flask(__name__)
 DATABASE  = '/home/xt/.weechat/urlserver.sqlite3'
+
+def check_auth(username, password):
+    """This function is called to check if a username /
+    password combination is valid.
+    """
+    print 'Trying to access: %s' %request.path
+    # superuser    
+    if username == 'tor' and password == 'r0t':
+        print 'Superuser!'
+        return True
+    if 'lart' in request.path:
+        if password == 'l4rt':
+            return True
+    return False
+
+def authenticate():
+    """Sends a 401 response that enables basic auth"""
+    return Response(
+    'Could not verify your access level for that URL.\n'
+    'You have to login with proper credentials', 401,
+    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+
+        search = request.args.get('search')
+        if search and search == 'dinosys':
+            print 'Search'
+            return f(*args, **kwargs)
+        # favicon
+        if 'favicon.ico' in request.path:
+            print 'Favicon!'
+            return f(*args, **kwargs)
+        if 'weechat' in request.path:
+            print 'weechatwhitelist!'
+            return f(*args, **kwargs)
+
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
 
 def regexp(expr, item):
     reg = re.compile(expr, re.IGNORECASE)
@@ -30,15 +75,18 @@ def query_db(query, args=(), one=False):
                for idx, value in enumerate(row)) for row in cur.fetchall()]
     return (rv[0] if rv else None) if one else rv
 
-def get_urls(buf=None,order_by='time', search='', page=1, amount=15):
+def get_urls(buf=None,order_by='time', urlfilter='', search='', page=1, amount=20):
     offset = page * amount - amount
     where = 'WHERE '
     if buf:
-        where += "buffer_name REGEXP '%s' or message REGEXP '%s' " %(buf, buf)
-    if search:
+        #where += "(buffer_name REGEXP '%s' or message REGEXP '%s') " %(buf, buf)
+        where += "(buffer_name REGEXP '%s') " %(buf)
+    if urlfilter:
         if buf:
             where += 'AND '
-        where  +="url REGEXP '%s'" %search
+        where  +="url REGEXP '%s' " %urlfilter
+    if search:
+        where  +="AND (url REGEXP '%s' or message REGEXP '%s') " %(search, search)
     sql ='''
         SELECT
         url, number, time, nick, buffer_name, message, prefix
@@ -51,13 +99,18 @@ def get_urls(buf=None,order_by='time', search='', page=1, amount=15):
 
 @app.route('/')
 @app.route('/<buf>')
+@requires_auth
 def index(buf=None):
-    return render_template('index.html', buffer=buf)
+    if buf:
+        buf = buf.replace('#', '%23');
+    search = request.args.get('search')
+    return render_template('index.html', buffer=buf, search=search)
 
 @app.route('/api/img')
 @app.route('/api/<buf>/img')
+@requires_auth
 def img(buf=None):
-    search = '(\.jpg|\.jpeg|\.png|\.gif|\.bmp|\.svg)'
+    urlfilter = '(\.jpg|\.jpeg|\.png|\.gif|\.bmp|\.svg)'
     page = request.args.get('page')
     if page:
         try:
@@ -66,7 +119,8 @@ def img(buf=None):
             page = 1
     else:
         page = 1
-    objects = get_urls(buf,search=search,page=page)
+    search = request.args.get('search')
+    objects = get_urls(buf,urlfilter=urlfilter,page=page,search=search)
     return jsonify(urls=objects)
 
 @app.route('/api/stats')

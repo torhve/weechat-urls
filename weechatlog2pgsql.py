@@ -6,6 +6,7 @@ import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.schema import (Table, Column, PrimaryKeyConstraint, UniqueConstraint, ForeignKey, ForeignKeyConstraint, Index, MetaData)
 
 Base = declarative_base()
 engine = create_engine('postgresql://weeurls:P!"#uppen@localhost/weechat', echo=False)
@@ -16,6 +17,7 @@ session = Session()
 
 class Message(Base):
     __tablename__ = 'lines'
+    __table_args__ = (UniqueConstraint('nick', 'message', name='_nick_message_uc'),)
 
     id = Column(Integer, primary_key=True)
     network = Column(String(20))
@@ -26,6 +28,7 @@ class Message(Base):
     nick = Column(String(63))
     message = Column(String(512))
 
+
     def __init__(self, network, time, buffer_name, notice, prefix, nick, message):
         self.network = network
         self.time = time
@@ -35,8 +38,9 @@ class Message(Base):
         self.nick = nick
         self.message = message
 
+
     def __repr__(self):
-       return "<User('%s','%s', '%s')>" % (self.name, self.fullname, self.password)
+       return "<Message('%s','%s','%s','%s')>" % (self.network, self.buffer_name, self.time, self.nick, self.message)
 
 if __name__ == '__main__':
     import sys
@@ -62,7 +66,7 @@ if __name__ == '__main__':
 
             # Parse notice
             notice = 0
-            if nick == '--': # Not a regular PRIVMSG
+            if '--' in nick: # Not a regular PRIVMSG
                 notice = 1
                 match = re.match('^Notice\((?P<nick>.+)\):', message)
                 if not match:
@@ -78,8 +82,8 @@ if __name__ == '__main__':
             dbl = Message(network, time, buffer_name, notice, prefix, nick, message)
             session.add(dbl)
             counter += 1
-            # commit for evry 500 line, or it will use very much memory
-            if counter == 20000:
+            # commit for evry x line, or it will use very much memory
+            if counter == 80000:
                 counter = 0
                 session.commit()
     session.commit()

@@ -3,43 +3,46 @@
   <head>
     <meta charset="utf-8" />
     <title>Weechat URLs</title>
-    <link rel="stylesheet" href="static/screen.css" type="text/css" />
+
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <link rel="apple-touch-icon" href="images/icons/icon-homescreen.png" />
-    <meta name="format-detection" content="telephone=no" />
-    <link rel="stylesheet" href="static/add2home.css">
     <script type="application/javascript" src="static/add2home.js"></script>
     <script type="application/javascript" src="static/masonry/jquery.masonry.min.js"></script>
     <script type="application/javascript" src="static/imagesloaded/jquery.imagesloaded.min.js"></script>
     <script type="application/javascript" src="static/lightview-3.2.5/js/spinners/spinners.min.js"></script>
     <script type="application/javascript" src="static/lightview-3.2.5/js/lightview/lightview.js"></script>
     <script type="application/javascript" src="static/infinite-scroll/jquery.infinitescroll.min.js"></script>
+
+    <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <link rel="stylesheet" href="static/screen.css" type="text/css" />
+    <link rel="apple-touch-icon" href="images/icons/icon-homescreen.png" />
+    <link rel="stylesheet" href="static/add2home.css">
     <link rel="stylesheet" type="text/css" href="static/lightview-3.2.5/css/lightview/lightview.css"/>
 
   </head>
   <body>
       <div id="container" class='container'>
       </div>
-      <nav id="next"><a href="api/{% if buffer %}{{buffer}}/{% endif %}img?page=2">Moar</a></nav>
+      <nav id="next"><a href="api/{% if buffer %}{{buffer}}/{% endif %}img?{%if search%}search={{search}}&{%endif%}page=2">Moar</a></nav>
 <script>
     var slides = [];
     var currentSlide = 0;
     var $container = $('#container');
     
-    var itemHTML = function(urlobj) {
+    var itemtoHTML = function(urlobj) {
         title = urlobj.nick + '@' + urlobj.buffer_name;
         caption = urlobj.message.replace(urlobj.url, '');
         return "<div class='item'><a class=lightview data-lightview-group=imgs data-lightview-title='"+title+"' data-lightview-caption='"+caption+"' href='"+urlobj.url+"'><img src="+urlobj.url+"></a><div class=meta><div class=title>"+title+"</div><div class=msg>"+caption+"</div></div></div>";
     }
     var addItem = function(slideobj, slidepos) {
-        $container.append(itemHTML(slideobj));
+        $container.append(itemtoHTML(slideobj));
     }
 
 
     // Fetch the urls
-    $.getJSON('api/{% if buffer %}{{buffer}}/{% endif %}img', function(data) { 
+    $.getJSON('api/{% if buffer %}{{buffer}}/{% endif %}img{%if search%}?search={{search}}{% endif %}', function(data) { 
         images = data.urls;
         $.each(images, function(i, obj) {
             addItem(obj, i);
@@ -51,7 +54,7 @@
             console.log( $broken.length + ' broken images' );
 
             $container.masonry({
-                itemSelector : '.item',
+                itemSelector : '.item'
             });
         });
 
@@ -60,6 +63,7 @@
     // Add infinite scrolling
     $container.infinitescroll({
       dataType: 'json', // we expect JSON
+      debug:false,
       navSelector  : '#next',    // selector for the paged navigation 
       nextSelector : '#next a:first',  // selector for the NEXT link (to page 2)
       loading: {
@@ -70,7 +74,7 @@
         var msg = "";
         data = data.urls;
         for(var i=0;i<data.length;i++) {
-            msg += itemHTML(data[i]); // convert data[i] (JSON data) to HTML.
+            msg += itemtoHTML(data[i]); // convert data[i] (JSON data) to HTML.
         }
         return msg;
       }},
@@ -83,7 +87,7 @@
 
             // show elems now they're ready
             $newElems.animate({ opacity: 1 });
-            $container.masonry( 'appended', $newElems, true ); 
+            $container.masonry( 'appended', $newElems ); 
         });
       }
     );
